@@ -1,20 +1,18 @@
-using System.IO;
-using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
 namespace src_functions
 {
-    public class Function1
+    public class Functions
     {
-        private readonly ILogger<Function1> _logger;
+        private readonly ILogger<Functions> _logger;
 
-        public Function1(ILogger<Function1> logger)
+        public Functions(ILogger<Functions> logger)
         {
             _logger = logger;
         }
 
-        [Function(nameof(Function1))]
+        [Function("BlobTrigger")]
         public async Task Run([BlobTrigger("blobs/{name}", Connection = "connection")] Stream stream, string name)
         {
             using var blobStreamReader = new StreamReader(stream);
