@@ -1,5 +1,7 @@
 ﻿using Azure.Storage.Blobs;
+using src_frontend.Models;
 using System.Text.Json;
+
 
 namespace src_frontend.Services
 {
@@ -10,25 +12,32 @@ namespace src_frontend.Services
 
         public DataService()
         {
-            blobServiceClient = new BlobServiceClient("storageAccount");
+            blobServiceClient = new BlobServiceClient("");
             containerClient = blobServiceClient.GetBlobContainerClient("blobs");
         }
 
-        public bool AddToStorage(string data)
+        public bool AddToStorage(string emailAddress)
         {
-            string json = JsonSerializer.Serialize(data);
-            byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(json);
+            string id = Guid.NewGuid().ToString();
 
-            string blobName = "blob_" + Guid.NewGuid().ToString() + ".json";
+            Subscriber subscriber = new()
+            {
+                Id = id,
+                EmailAddress = emailAddress
+            };
+
+            string json = JsonSerializer.Serialize(subscriber);
+            byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(json);
+            string blobName = Guid.NewGuid().ToString() + ".json";
 
             using (MemoryStream memoryStream = new MemoryStream(byteArray))
             {
-                if (containerClient.UploadBlob(blobName, memoryStream).Value != null)
+                if (containerClient.UploadBlob(blobName, memoryStream).GetRawResponse().IsError)
                 {
-                    return true;
+                    return false;
                 }
 
-                return false;
+                return true;
             }
         }
     }
