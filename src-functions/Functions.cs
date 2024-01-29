@@ -35,7 +35,7 @@ namespace src_functions
                 "ExamplePayload"
             );
             client.SendEventAsync(ev).GetAwaiter().GetResult();
-            _logger.LogInformation($"Event sent");
+            _logger.LogInformation($"Event sent"); // logger
         }
         [Function("EventTrigger")]
         public void EventTrigger([EventGridTrigger] Azure.Messaging.EventGrid.EventGridEvent eventGridEvent)
