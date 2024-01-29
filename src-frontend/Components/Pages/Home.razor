@@ -1,7 +1,36 @@
 ﻿@page "/"
+@using src_frontend.Models
+@inject DataService DataService
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Dupont newsletter</h1>
 
-Welcome to your new app.
+<div>
+    <input type="email" @bind="emailAddressInput" />
+    <button @onclick="AddToStorage">Sign up!</button>
+</div>
+
+@if (errorIsVisible)
+{
+    <p style="color:red; font-weight:bold;">Please enter a valid email address!</p>
+}
+
+@code {
+    string? emailAddressInput;
+    bool errorIsVisible = false;
+
+    private void AddToStorage()
+    {
+        if (emailAddressInput == null)
+        {
+            errorIsVisible = true;
+        }
+        else
+        {
+            errorIsVisible = false;           
+            DataService.AddToStorage(emailAddressInput);
+            emailAddressInput = null;
+        }
+    }
+}
