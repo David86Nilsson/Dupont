@@ -41,7 +41,7 @@ namespace src_functions
         public void EventTrigger([EventGridTrigger] Azure.Messaging.EventGrid.EventGridEvent eventGridEvent)
         {
             // TODO Gör något när EventGrid får ett event
-            _logger.LogInformation($"C# EventGrid trigger function processed an event: {eventGridEvent.Data}");
+            _logger.LogInformation($"C# EventGrid trigger function processed an event: {eventGridEvent.Data.ToString()}");
         }
     }
 }
