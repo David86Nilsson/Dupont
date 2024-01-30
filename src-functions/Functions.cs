@@ -23,8 +23,9 @@ namespace src_functions
             // TODO: Skapa event och skicka till EventGrid
             _logger.LogInformation($"C# Blob trigger function Processed blob\n Name: {name} \n Data: {content}");
 
-            string endpoint = Environment.GetEnvironmentVariable("EventGrid:TopicEndpoint") ?? "";
-            string key = Environment.GetEnvironmentVariable("EventGrid:TopicKey") ?? "";
+            string endpoint = Environment.GetEnvironmentVariable("TopicEndpoint") ?? "";
+            string key = Environment.GetEnvironmentVariable("TopicKey") ?? "";
+
             EventGridPublisherClient client = new EventGridPublisherClient(new Uri(endpoint), new AzureKeyCredential(key));
 
             EventGridEvent ev = new EventGridEvent(
