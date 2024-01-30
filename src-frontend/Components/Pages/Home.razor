@@ -1,6 +1,7 @@
-﻿@page "/"
+@page "/"
 @using src_frontend.Models
 @inject DataService DataService
+
 
 
 
@@ -197,9 +198,15 @@
         }
         else
         {
+
             errorIsVisible = false;
+
             DataService.AddToStorage(emailAddressInput);
             emailAddressInput = null;
         }
     }
+
 }
+
+}
+

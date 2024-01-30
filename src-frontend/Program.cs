@@ -1,10 +1,18 @@
 using src_frontend.Components;
+using src_frontend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddSingleton<DataService>();
+
+IConfiguration configuration = new ConfigurationBuilder()
+.SetBasePath(Directory.GetCurrentDirectory())
+.AddJsonFile("appsettings.json")
+.Build();
 
 var app = builder.Build();
 
