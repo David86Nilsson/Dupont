@@ -1,12 +1,14 @@
 using Azure;
 using Azure.Messaging.EventGrid;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace src_functions
 {
-    public class Functions
+    public class Functions(IConfiguration configuration)
     {
+        IConfiguration _configuration;
         private readonly ILogger<Functions> _logger;
 
         public Functions(ILogger<Functions> logger)
@@ -23,9 +25,8 @@ namespace src_functions
             // TODO: Skapa event och skicka till EventGrid
             _logger.LogInformation($"C# Blob trigger function Processed blob\n Name: {name} \n Data: {content}");
 
-            string endpoint = "https://evgt-dupont.eastus-1.eventgrid.azure.net/api/events";
-            string key = "zepu1T7YbODPtxlmtjJPtlFcU+yYBU5pVxA2SS6gugA=";
-
+            string endpoint = Environment.GetEnvironmentVariable("EventGrid:TopicEndpoint") ?? "";
+            string key = Environment.GetEnvironmentVariable("EventGrid:TopicKey") ?? "";
             EventGridPublisherClient client = new EventGridPublisherClient(new Uri(endpoint), new AzureKeyCredential(key));
 
             EventGridEvent ev = new EventGridEvent(
