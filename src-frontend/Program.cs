@@ -9,6 +9,11 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddSingleton<DataService>();
 
+IConfiguration configuration = new ConfigurationBuilder()
+.SetBasePath(Directory.GetCurrentDirectory())
+.AddJsonFile("appsettings.json")
+.Build();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
