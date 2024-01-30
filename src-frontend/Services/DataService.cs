@@ -19,7 +19,6 @@ namespace src_frontend.Services
         public bool AddToStorage(string emailAddress)
         {
             string id = Guid.NewGuid().ToString();
-
             Subscriber subscriber = new()
             {
                 Id = id,
