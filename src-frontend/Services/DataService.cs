@@ -7,13 +7,18 @@ namespace src_frontend.Services
 {
     public class DataService
     {
-        BlobServiceClient blobServiceClient;
-        BlobContainerClient containerClient;
+        BlobServiceClient? blobServiceClient;
+        BlobContainerClient? containerClient;
 
-        public DataService()
+        public DataService(IConfiguration configuration)
         {
-            blobServiceClient = new BlobServiceClient("");
-            containerClient = blobServiceClient.GetBlobContainerClient("blobs");
+            string? storageAccount = configuration.GetConnectionString("StorageAccount");
+
+            if (storageAccount != null)
+            {
+                blobServiceClient = new BlobServiceClient(storageAccount);
+                containerClient = blobServiceClient.GetBlobContainerClient("blobs");
+            }
         }
 
         public bool AddToStorage(string emailAddress)
