@@ -32,16 +32,16 @@ namespace src_functions
                 "ExampleEventSubject",
                 "Example.EventType",
                 "1.0",
-                "ExamplePayload"
+                content
             );
             client.SendEventAsync(ev).GetAwaiter().GetResult();
             _logger.LogInformation($"Event sent"); // logger
         }
         [Function("EventTrigger")]
-        public void EventTrigger([EventGridTrigger] Azure.Messaging.EventGrid.EventGridEvent eventGridEvent)
+        public async Task EventTrigger([EventGridTrigger] string eventGridEvent)
         {
             // TODO Gör något när EventGrid får ett event
-            _logger.LogInformation($"C# EventGrid trigger function processed an event: {eventGridEvent.Data.ToString()}");
+            _logger.LogInformation($"C# EventGrid trigger function processed an event: {eventGridEvent}");
         }
     }
 }
