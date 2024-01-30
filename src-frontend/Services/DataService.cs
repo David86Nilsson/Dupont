@@ -12,7 +12,7 @@ namespace src_frontend.Services
 
         public DataService()
         {
-            blobServiceClient = new BlobServiceClient("");
+            blobServiceClient = new BlobServiceClient("storageAccount");
             containerClient = blobServiceClient.GetBlobContainerClient("blobs");
         }
 
