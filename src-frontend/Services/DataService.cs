@@ -12,7 +12,7 @@ namespace src_frontend.Services
 
         public DataService(IConfiguration configuration)
         {
-            string? storageAccount = configuration.GetConnectionString("StorageAccount");
+            string? storageAccount = configuration.GetConnectionString("storageAccount");
 
             if (storageAccount != null)
             {
