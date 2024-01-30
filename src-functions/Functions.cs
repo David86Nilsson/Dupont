@@ -1,14 +1,12 @@
 using Azure;
 using Azure.Messaging.EventGrid;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace src_functions
 {
-    public class Functions(IConfiguration configuration)
+    public class Functions
     {
-        IConfiguration _configuration;
         private readonly ILogger<Functions> _logger;
 
         public Functions(ILogger<Functions> logger)
