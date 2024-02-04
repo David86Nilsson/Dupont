@@ -2,6 +2,8 @@ using Azure;
 using Azure.Messaging.EventGrid;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using src_functions.Models;
+using System.Text.Json;
 
 namespace src_functions
 {
@@ -42,6 +44,27 @@ namespace src_functions
         {
             // TODO Gör något när EventGrid får ett event
             _logger.LogInformation($"C# EventGrid trigger function processed an event: {eventGridEvent}");
+        }
+
+        public async Task<DrinkApiModel> GetDrinkFromApi()
+        {
+            HttpClient httpClient = new HttpClient();
+
+            HttpResponseMessage response = await httpClient.GetAsync("https://www.thecocktaildb.com/api/json/v1/1/random.php");
+
+            if (response.IsSuccessStatusCode)
+            {
+                string responseContent = await response.Content.ReadAsStringAsync();
+
+                DrinkApiModel? drinkApiModel = JsonSerializer.Deserialize<DrinkApiModel>(responseContent);
+
+                if (drinkApiModel != null)
+                {
+                    return drinkApiModel;
+                }
+            }
+
+            throw new Exception("Error! Could not retrieve data from api.");
         }
     }
 }
