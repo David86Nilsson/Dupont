@@ -46,7 +46,7 @@ namespace src_functions
             _logger.LogInformation($"C# EventGrid trigger function processed an event: {eventGridEvent}");
         }
 
-        public async Task<DrinkApiModel> GetDrinkFromApi()
+        public async Task<DrinkModel> GetDrinkFromApi()
         {
             HttpClient httpClient = new HttpClient();
 
@@ -58,9 +58,31 @@ namespace src_functions
 
                 DrinkApiModel? drinkApiModel = JsonSerializer.Deserialize<DrinkApiModel>(responseContent);
 
-                if (drinkApiModel != null)
+                if (drinkApiModel != null && drinkApiModel.drinks != null && drinkApiModel.drinks[0] != null)
                 {
-                    return drinkApiModel;
+                    DrinkModel drinkModel = new();
+
+                    drinkModel.Name = drinkApiModel.drinks[0].strDrink;
+
+                    foreach (var property in drinkApiModel.drinks[0].GetType().GetProperties())
+                    {
+                        if (property.Name.StartsWith("strIngredient"))
+                        {
+                            var propertyValue = property.GetValue(drinkApiModel.drinks[0]);
+
+                            if (propertyValue != null)
+                            {
+                                string? ingredient = propertyValue.ToString();
+
+                                if (!string.IsNullOrWhiteSpace(ingredient))
+                                {
+                                    drinkModel.Ingredients.Add(ingredient);
+                                }
+                            }
+                        }
+                    }
+
+                    return drinkModel;
                 }
             }
 
