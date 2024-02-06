@@ -36,7 +36,7 @@ namespace src_frontend.Services
 
             using (MemoryStream memoryStream = new MemoryStream(byteArray))
             {
-                if (containerClient.UploadBlob(blobName, memoryStream).GetRawResponse().IsError)
+                if (containerClient != null && containerClient.UploadBlob(blobName, memoryStream).GetRawResponse().IsError)
                 {
                     return false;
                 }
