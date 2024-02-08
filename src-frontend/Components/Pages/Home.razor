@@ -40,7 +40,9 @@
                     <label for="stayLoggedIn">Kom ihåg mig</label>
                     <input type="checkbox" id="stayLoggedIn" name="stayLoggedIn">
                 </div> *@
-                <button @onclick="AddToStorage" class="logInButton" type="submit">Subscribe</button>
+                
+                <button @onclick="AddToStorage" class="logInButton @(isEmailSubmitted ? "success" : "")" type="submit">@buttonText</button>
+                 
             </form>
 
             <div style="text-align: center; margin-top: 20px; margin-bottom: -20px; font-family: Georgia;">
@@ -123,6 +125,12 @@
             background-color: deeppink;
         }
 
+        .login-container button:active
+        {
+            background-color: green;
+            transition-duration: 5s;
+        }
+
     .login-links {
         margin-top: 20px;
         text-align: center;
@@ -176,6 +184,10 @@
         position: relative;
         margin-top: 10px;
     }
+
+    .success {
+        background-color: green;
+    }
 </style>
 
 
@@ -190,7 +202,10 @@
     string? emailAddressInput;
     bool errorIsVisible = false;
 
-    private void AddToStorage()
+    bool isEmailSubmitted = false;
+    string buttonText = "Subscribe";
+
+    private async Task AddToStorage()
     {
         if (emailAddressInput == null)
         {
@@ -200,6 +215,13 @@
         {
 
             errorIsVisible = false;
+
+            isEmailSubmitted = true;
+            buttonText = "Subscribed";
+            
+            await Task.Delay(33000); // 5 seconds
+            isEmailSubmitted = false;
+            buttonText = "Subscribe";
 
             DataService.AddToStorage(emailAddressInput);
             emailAddressInput = null;
