@@ -10,7 +10,18 @@
     }
   },
   "ConnectionStrings": {
-    "connection": "connectionString"
+    "connection": "connectionString",
+    "sbConnectionString": ""
+  },
+
+
+
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "connection": "UseDevelopmentStorage=true",
+    "ServiceBusConnection__fullyQualifiedNamespace": "ServiceBusConnection__fullyQualifiedNamespace"
+
   },
   "EventGrid": {
     "TopicEndpoint": "topicEndpoint",
