@@ -41,7 +41,7 @@
                     <input type="checkbox" id="stayLoggedIn" name="stayLoggedIn">
                 </div> *@
                 
-                <button @onclick="AddToStorage" class="logInButton @(isEmailSubmitted ? "success" : "")" type="submit">@buttonText</button>
+                <button @onclick="AddToStorage" id="myButton" class="logInButton @(isEmailSubmitted ? "success" : "")" type="submit">@buttonText</button>
                  
             </form>
 
@@ -110,6 +110,11 @@
         text-indent: 5px;
     }
 
+    .logInButton:active {
+        background-color: green;
+        /* transition-duration: 5s; */
+    }
+
     .login-container button {
         width: 100%;
         height: 40px;
@@ -125,11 +130,7 @@
             background-color: deeppink;
         }
 
-        .login-container button:active
-        {
-            background-color: green;
-            transition-duration: 5s;
-        }
+        
 
     .login-links {
         margin-top: 20px;
@@ -195,7 +196,7 @@
 
 @if (errorIsVisible)
 {
-    <p style="color:red; font-weight:bold;">Please enter a valid email address!</p>
+    <p style="color:red; font-weight:bold; text-align: center;">Please enter a valid email address!</p>
 }
 
 @code {
@@ -229,6 +230,14 @@
     }
 
 }
+
+
+<script>
+    const button = document.getElementById('myButton');
+    button.addEventListener('click', () => {
+      button.style.backgroundColor = 'green'; // Change to desired color
+    });
+</script>
 
 }
 

@@ -12,6 +12,7 @@ using System.Text;
 using System.Text.Json;
 using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 using src_functions.Models;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 
 
@@ -97,7 +98,7 @@ namespace src_functions
             try
             {
                 // Use the raw eventGridEvent as a string
-                string messageContent = $"Received Event: {eventGridEvent}";
+                string messageContent = eventGridEvent;
 
                 // Send the message to Service Bus asynchronously
                 await SendMessageToServiceBusAsync(messageContent);
@@ -155,38 +156,40 @@ namespace src_functions
 
                 _logger.LogInformation($"C# ServiceBus topic trigger function processed message. {message.Body}");
 
-                
+
+
+
 
                 //parsing bson
 
                 //string bsonLikeString = Encoding.UTF8.GetString(message.Body);
 
-                
+
                 //BsonDocument bsonDocument = BsonDocument.Parse(bsonLikeString);
 
-                
+
                 //string jsonData = bsonDocument["data"].AsString;
 
-               
+
                 //BsonDocument nestedDocument = BsonDocument.Parse(jsonData);
 
-               
+
                 //string emailAddress = nestedDocument["EmailAddress"].AsString;
 
-                
+
                 //_logger.LogInformation($"C# EmailAddress: {emailAddress}");
 
 
 
 
-               
 
 
-                
-       
+
+
+
                 //EventMessage eventMessage = JsonConvert.DeserializeObject<EventMessage>(jsonString);
 
-        
+
                 //string emailAddress = eventMessage.data.EmailAddress;
                 //_logger.LogInformation($"C# EmailAddress: {emailAddress}");
 
@@ -194,21 +197,59 @@ namespace src_functions
 
 
 
+                //string jsonString = Encoding.UTF8.GetString(message.Body);
+
+                //string formattedMessage = message.Body.ToString().Replace("\\", "");
+
+                //_logger.LogInformation(formattedMessage);
+
+                ServiceBusDataModel? serviceBusDataModel = System.Text.Json.JsonSerializer.Deserialize<ServiceBusDataModel>(message.Body);
+
+                if(serviceBusDataModel == null)
+                {
+                    _logger.LogInformation("serviceBusDataModel is null");
+                }
+
+
+                else if (serviceBusDataModel.data == null)
+                {
+                    _logger.LogInformation($"C# Data is null");
+                }
+
+                else if (serviceBusDataModel.data.EmailAddress == null)
+                {
+                    _logger.LogInformation($"C# Email Address is null");
+                }
+
+
+
+                _logger.LogInformation($"C# ServiceBus topic trigger extracted EmailAddress - {serviceBusDataModel.data.EmailAddress}");
+
+                //var emailAddress = message.Body.ToObjectFromJson();
 
 
                 //JObject jsonObject = JObject.Parse(jsonString);
 
-                
+
                 //JObject dataObject = JObject.Parse((string)jsonObject["id"]);
 
-                //_logger.LogInformation($"C# ServiceBus topic trigger function processed message dataObject. {dataObject}");
+                //string dataObject = (string)jsonObject["data"];
 
-                //string emailAddress = (string)dataObject["EmailAddress"];
+                //string email = (string)jsonObject["data"];
+
+                //JObject emailObject = JObject.Parse(dataObject);
+
+                //string emailAddress = (string)jsonObject["EmailAddress"];
+
+
+                _logger.LogInformation($"C# ServiceBus topic trigger extracted EmailAddress - ");
+
+                
 
                 //_logger.LogInformation($"C# EmailAddress: {emailAddress}");
 
 
-              
+
 
 
 
@@ -237,7 +278,7 @@ namespace src_functions
 
 
 
-               
+
 
 
 
@@ -258,7 +299,7 @@ namespace src_functions
 
 
 
-             
+
 
 
 
@@ -440,7 +481,7 @@ namespace src_functions
             {
                 string responseContent = await response.Content.ReadAsStringAsync();
 
-                DrinkApiModel? drinkApiModel = JsonSerializer.Deserialize<DrinkApiModel>(responseContent);
+                DrinkApiModel? drinkApiModel = System.Text.Json.JsonSerializer.Deserialize<DrinkApiModel>(responseContent);
 
                 if (drinkApiModel != null && drinkApiModel.drinks != null && drinkApiModel.drinks[0] != null)
                 {
