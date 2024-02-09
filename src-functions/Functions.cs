@@ -4,14 +4,10 @@ using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Text;
-using System.Text.Json;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 using src_functions.Models;
+using System.Text;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 
@@ -37,7 +33,7 @@ namespace src_functions
         {
             public string id { get; set; }
             public string Source { get; set; }
-            public EventData data { get; set; } 
+            public EventData data { get; set; }
         }
 
 
@@ -45,7 +41,7 @@ namespace src_functions
 
         private readonly ILogger<Functions> _logger;
 
-        public Functions(ILogger<Functions> logger )
+        public Functions(ILogger<Functions> logger)
         {
             _logger = logger;
         }
@@ -125,10 +121,10 @@ namespace src_functions
 
             try
             {
-                
+
                 var message = new ServiceBusMessage(messageContent);
 
-                
+
                 await sender.SendMessageAsync(message);
             }
             catch (Exception ex)
@@ -139,13 +135,13 @@ namespace src_functions
             {
 
                 await sender.CloseAsync();
-                
-                
+
+
             }
         }
 
         [Function("ServiceBusTrigger")]
-            public async Task ServiceBusTrigger([ServiceBusTrigger(
+        public async Task ServiceBusTrigger([ServiceBusTrigger(
 
         "sb-users",
         "sbs-dupont",
@@ -155,10 +151,6 @@ namespace src_functions
             {
 
                 _logger.LogInformation($"C# ServiceBus topic trigger function processed message. {message.Body}");
-
-
-
-
 
                 //parsing bson
 
@@ -204,26 +196,25 @@ namespace src_functions
                 //_logger.LogInformation(formattedMessage);
 
                 ServiceBusDataModel? serviceBusDataModel = System.Text.Json.JsonSerializer.Deserialize<ServiceBusDataModel>(message.Body);
-
-                if(serviceBusDataModel == null)
+                if (serviceBusDataModel == null)
                 {
-                    _logger.LogInformation("serviceBusDataModel is null");
+                    throw new Exception("ServiceBusDataModel is null");
                 }
-
-
                 else if (serviceBusDataModel.data == null)
                 {
-                    _logger.LogInformation($"C# Data is null");
+                    throw new Exception("ServiceBusDataModel.data is null");
                 }
-
-                else if (serviceBusDataModel.data.EmailAddress == null)
+                EmailDataModel? emailDataModel = System.Text.Json.JsonSerializer.Deserialize<EmailDataModel>(serviceBusDataModel.data);
+                if (serviceBusDataModel != null)
                 {
-                    _logger.LogInformation($"C# Email Address is null");
+                    emailDataModel = System.Text.Json.JsonSerializer.Deserialize<EmailDataModel>(serviceBusDataModel.data);
+                }
+                else
+                {
+                    throw new Exception("EmailDataModel is null");
                 }
 
-
-
-                _logger.LogInformation($"C# ServiceBus topic trigger extracted EmailAddress - {serviceBusDataModel.data.EmailAddress}");
+                _logger.LogInformation($"C# ServiceBus topic trigger extracted EmailAddress - {emailDataModel.EmailAddress}");
 
                 //var emailAddress = message.Body.ToObjectFromJson();
 
@@ -242,9 +233,6 @@ namespace src_functions
                 //string emailAddress = (string)jsonObject["EmailAddress"];
 
 
-                _logger.LogInformation($"C# ServiceBus topic trigger extracted EmailAddress - ");
-
-                
 
                 //_logger.LogInformation($"C# EmailAddress: {emailAddress}");
 
@@ -329,7 +317,7 @@ namespace src_functions
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing Service Bus message.");
+                _logger.LogError(ex, ex.Message);
             }
         }
 
@@ -342,22 +330,22 @@ namespace src_functions
         private string ExtractEmailAddress(string messageBody)
         {
             try
-                {
+            {
 
-                 JObject jsonObject = JObject.Parse(messageBody);
+                JObject jsonObject = JObject.Parse(messageBody);
 
-        
-            
+
+
                 string emailAddress = (string)jsonObject["data"];
                 return emailAddress;
-        
-       
-                }
+
+
+            }
             catch (JsonReaderException ex)
             {
-        
+
                 _logger.LogError(ex, "Error parsing JSON message body.");
-                return null; 
+                return null;
             }
         }
 
@@ -421,16 +409,16 @@ namespace src_functions
         //        //string messageBody = Encoding.UTF8.GetString(message.Body);
         //        
         //        //JObject jsonObject = JObject.Parse(messageBody);
-   
+
         //        //string emailAddress = (string)jsonObject["EmailAddress"];
 
         //        return emailAddress;
         //    }
 
-        
 
 
-     
+
+
 
         private static string ExtractEmailFromMessage(string message)
         {

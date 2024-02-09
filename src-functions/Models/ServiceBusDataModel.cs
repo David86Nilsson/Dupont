@@ -7,12 +7,7 @@
         public string? type { get; set; }
         public string? time { get; set; }
         public string? subject { get; set; }
-        public EmailDataModel? data { get; set; }
+        public string? data { get; set; }
 
-    }
-    public class EmailDataModel
-    {
-        public string? Id { get; set; }
-        public string? EmailAddress { get; set; }
     }
 }
