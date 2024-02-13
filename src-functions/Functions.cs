@@ -12,25 +12,6 @@ namespace src_functions
 {
     public class Functions
     {
-        public class BusMessage
-        {
-            public string EmailAddress { get; set; }
-            public string Subject { get; set; }
-        }
-
-        public class EventData
-        {
-            public string Id { get; set; }
-            public string EmailAddress { get; set; }
-        }
-
-        public class EventMessage
-        {
-            public string id { get; set; }
-            public string Source { get; set; }
-            public EventData data { get; set; }
-        }
-
         private readonly ILogger<Functions> _logger;
 
         public Functions(ILogger<Functions> logger)
@@ -41,42 +22,46 @@ namespace src_functions
         [Function("BlobTrigger")]
         public async Task BlobTrigger([BlobTrigger("blobs/{name}", Connection = "connection")] Stream stream, string name)
         {
-            using var blobStreamReader = new StreamReader(stream);
-            var content = await blobStreamReader.ReadToEndAsync();
+            try
+            {
+                using var blobStreamReader = new StreamReader(stream);
+                var content = await blobStreamReader.ReadToEndAsync();
 
-            _logger.LogInformation($"C# Blob trigger function Processed blob\n Name: {name} \n Data: {content}");
+                _logger.LogInformation($"C# Blob trigger function Processed blob\n Name: {name} \n Data: {content}");
 
-            string endpoint = Environment.GetEnvironmentVariable("TopicEndpoint") ?? "";
-            string key = Environment.GetEnvironmentVariable("TopicKey") ?? "";
+                string endpoint = Environment.GetEnvironmentVariable("TopicEndpoint") ?? "";
+                string key = Environment.GetEnvironmentVariable("TopicKey") ?? "";
 
-            EventGridPublisherClient client = new EventGridPublisherClient(new Uri(endpoint), new AzureKeyCredential(key));
+                EventGridPublisherClient client = new EventGridPublisherClient(new Uri(endpoint), new AzureKeyCredential(key));
 
-            EventGridEvent ev = new EventGridEvent(
-                "ExampleEventSubject",
-                "Example.EventType",
-                "1.0",
-                content
-            );
-            client.SendEventAsync(ev).GetAwaiter().GetResult();
-            _logger.LogInformation($"Event sent");
+                EventGridEvent ev = new EventGridEvent(
+                    "ExampleEventSubject",
+                    "Example.EventType",
+                    "1.0",
+                    content
+                );
+                client.SendEventAsync(ev).GetAwaiter().GetResult();
+                _logger.LogInformation($"Event sent to EventGrid");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+            }
         }
 
         [Function("EventTrigger")]
         public async Task EventTrigger([EventGridTrigger] string eventGridEvent)
         {
-            _logger.LogInformation($"C# EventGrid trigger function processed an event: {eventGridEvent}");
-
             try
             {
+                _logger.LogInformation($"C# EventGrid trigger function processed an event.");
+
                 string messageContent = eventGridEvent;
-
                 await SendMessageToServiceBusAsync(messageContent);
-
-                _logger.LogInformation($"Message sent to Service Bus: {messageContent}");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error processing event: {ex.Message}");
+                _logger.LogError($"Error processing in event in EventTrigger: {ex.Message}");
             }
         }
 
@@ -94,6 +79,8 @@ namespace src_functions
                 var message = new ServiceBusMessage(messageContent);
 
                 await sender.SendMessageAsync(message);
+
+                _logger.LogInformation($"Message sent to Service Bus.");
             }
             catch (Exception ex)
             {
@@ -114,7 +101,7 @@ namespace src_functions
         {
             try
             {
-                _logger.LogInformation($"C# ServiceBus topic trigger function processed message. {message.Body}");
+                _logger.LogInformation($"C# ServiceBus topic trigger function processed message.");
 
                 ServiceBusDataModel? serviceBusDataModel = System.Text.Json.JsonSerializer.Deserialize<ServiceBusDataModel>(message.Body);
                 if (serviceBusDataModel == null)
@@ -149,23 +136,30 @@ namespace src_functions
 
         public void SaveEmailToCosmosDB(string email, ILogger log)
         {
-            string? cosmosEndpoint = Environment.GetEnvironmentVariable("CosmosEndpoint");
-            string? cosmosKey = Environment.GetEnvironmentVariable("CosmosPrimaryKey");
-            string? databaseName = Environment.GetEnvironmentVariable("CosmosDatabaseName");
-            string? containerName = Environment.GetEnvironmentVariable("CosmosContainerName");
-
-            CosmosClient cosmosClient = new CosmosClient(cosmosEndpoint, cosmosKey);
-            var database = cosmosClient.GetDatabase(databaseName);
-            var container = database.GetContainer(containerName);
-
-            var document = new
+            try
             {
-                id = Guid.NewGuid().ToString(),
-                Email = email
-            };
+                string? cosmosEndpoint = Environment.GetEnvironmentVariable("CosmosEndpoint");
+                string? cosmosKey = Environment.GetEnvironmentVariable("CosmosPrimaryKey");
+                string? databaseName = Environment.GetEnvironmentVariable("CosmosDatabaseName");
+                string? containerName = Environment.GetEnvironmentVariable("CosmosContainerName");
 
-            var result = container.CreateItemAsync(document).Result;
-            log.LogInformation($"Email saved to Cosmos DB. Request charge: {result.RequestCharge}");
+                CosmosClient cosmosClient = new CosmosClient(cosmosEndpoint, cosmosKey);
+                var database = cosmosClient.GetDatabase(databaseName);
+                var container = database.GetContainer(containerName);
+
+                var document = new
+                {
+                    id = Guid.NewGuid().ToString(),
+                    Email = email
+                };
+
+                var result = container.CreateItemAsync(document).Result;
+                log.LogInformation($"Email saved to Cosmos DB. Request charge: {result.RequestCharge}");
+            }
+            catch (Exception ex)
+            {
+                log.LogError($"Error saving email to Cosmos DB: {ex.Message}");
+            }
         }
 
         public async Task<EmailModel> GetEmailModel(string emailAddress)
