@@ -187,6 +187,8 @@ namespace src_functions
 
                     emailModel.DrinkName = drinkApiModel.drinks[0].strDrink;
 
+                    emailModel.ImageUrl = drinkApiModel.drinks[0].strDrinkThumb;
+
                     foreach (var property in drinkApiModel.drinks[0].GetType().GetProperties())
                     {
                         if (property.Name.StartsWith("strIngredient"))
