@@ -10,7 +10,7 @@
     }
   },
   "ConnectionStrings": {
-    "connection": "connectionString",
+    "connection": "",
     "sbConnectionString": ""
   },
 
@@ -20,8 +20,13 @@
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
     "connection": "UseDevelopmentStorage=true",
-    "ServiceBusConnection__fullyQualifiedNamespace": "ServiceBusConnection__fullyQualifiedNamespace"
-
+    "ServiceBusConnection__fullyQualifiedNamespace": "ServiceBusConnection__fullyQualifiedNamespace",
+    "CosmosPrimaryKey": "",
+    "CosmosEndpoint": "",
+    "CosmosDatabaseName": "",
+    "CosmosContainerName": "",
+    "CocktailDbRequestUri": "",
+    "LogicAppEndPoint":  ""
   },
   "EventGrid": {
     "TopicEndpoint": "topicEndpoint",
