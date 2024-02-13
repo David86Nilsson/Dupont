@@ -122,7 +122,7 @@ namespace src_functions
                     throw new Exception("EmailDataModel is null");
                 }
 
-                _logger.LogInformation($"C# ServiceBus topic trigger extracted EmailAddress - {emailDataModel.EmailAddress}");
+                _logger.LogInformation($"C# ServiceBus topic trigger extracted EmailAddress: {emailDataModel.EmailAddress}");
 
                 SaveEmailToCosmosDB(emailDataModel.EmailAddress, _logger);
 
