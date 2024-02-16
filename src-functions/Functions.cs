@@ -94,7 +94,7 @@ namespace src_functions
 
         [Function("ServiceBusTrigger")]
         public async Task ServiceBusTrigger([ServiceBusTrigger(
-
+//fix code formatting
         "sb-users",
         "sbs-dupont",
         Connection = "sbConnectionString")] ServiceBusReceivedMessage message)
@@ -173,7 +173,7 @@ namespace src_functions
 
                 DrinkApiModel? drinkApiModel = System.Text.Json.JsonSerializer.Deserialize<DrinkApiModel>(responseContent);
 
-                if (drinkApiModel != null && drinkApiModel.drinks != null && drinkApiModel.drinks[0] != null)
+                if (drinkApiModel != null && drinkApiModel.drinks != null && drinkApiModel.drinks[0] != null) //fix if drinkApiModel?.drinks?.Count > 0
                 {
                     EmailModel emailModel = new();
 
@@ -185,7 +185,7 @@ namespace src_functions
 
                     foreach (var property in drinkApiModel.drinks[0].GetType().GetProperties())
                     {
-                        if (property.Name.StartsWith("strIngredient"))
+                        if (property.Name.StartsWith("strIngredient")) //fix could have used Linq
                         {
                             var propertyValue = property.GetValue(drinkApiModel.drinks[0]);
 
